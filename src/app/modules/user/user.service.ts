@@ -15,10 +15,15 @@ const getAllUserIntoDb = async () => {
   });
   return result;
 };
+const getUserByIdIntoDb = async (userId: number) => {
+  const result = await UserModel.findOne({ userId });
+  return result;
+};
 
 const userServices = {
   createUserIntoDb,
   getAllUserIntoDb,
+  getUserByIdIntoDb,
 };
 
 export default userServices;
