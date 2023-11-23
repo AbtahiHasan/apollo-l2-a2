@@ -1,5 +1,7 @@
 import mongoose, { Model, Schema } from 'mongoose';
+import bcrypt from 'bcrypt';
 import { Order, User } from './user.interface';
+import config from '../../config';
 
 const orderSchema = new Schema<Order>({
   productName: {
@@ -27,6 +29,7 @@ const userSchema = new Schema<User>({
   password: {
     type: String,
     required: true,
+    select: false,
   },
   fullName: {
     firstName: {
@@ -66,6 +69,20 @@ const userSchema = new Schema<User>({
     },
   },
   orders: [orderSchema],
+});
+
+userSchema.pre('save', async function (next) {
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  next();
+});
+
+userSchema.post('save', (document, next) => {
+  document.password = '';
+  next();
 });
 
 const UserModel: Model<User> = mongoose.model('user', userSchema);
