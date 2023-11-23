@@ -26,6 +26,35 @@ const createUser = async (req: Request, res: Response) => {
     });
   }
 };
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params?.userId;
+    const userData = req.body;
+    const zodParsedData = userValidationSchema.parse(userData);
+
+    const result = await userServices.updateUserIntoDb(
+      Number(userId),
+      zodParsedData,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully!',
+      data: result,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'internal server error',
+      error: error,
+      // error: {
+      //   code: 400,
+      //   description: 'User not found!',
+      // },
+    });
+  }
+};
 const getAllUsers = async (req: Request, res: Response) => {
   try {
     const result = await userServices.getAllUserIntoDb();
@@ -75,6 +104,7 @@ const getUserById = async (req: Request, res: Response) => {
 
 const userController = {
   createUser,
+  updateUser,
   getAllUsers,
   getUserById,
 };

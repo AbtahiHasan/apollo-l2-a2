@@ -1,9 +1,10 @@
-import mongoose, { Model, Schema } from 'mongoose';
+/* eslint-disable no-unused-vars */
+import { model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { Order, User } from './user.interface';
+import { IUserModel, TOrder, TUser } from './user.interface';
 import config from '../../config';
 
-const orderSchema = new Schema<Order>({
+const orderSchema = new Schema<TOrder>({
   productName: {
     type: String,
     required: true,
@@ -17,7 +18,7 @@ const orderSchema = new Schema<Order>({
     required: true,
   },
 });
-const userSchema = new Schema<User>({
+const userSchema = new Schema<TUser, IUserModel>({
   userId: {
     type: Number,
     required: true,
@@ -85,5 +86,10 @@ userSchema.post('save', (document, next) => {
   next();
 });
 
-const UserModel: Model<User> = mongoose.model('user', userSchema);
+userSchema.statics.isUserExists = async function (userId: number) {
+  const existingUser = await UserModel.findOne({ userId });
+  return existingUser;
+};
+
+const UserModel = model<TUser, IUserModel>('User', userSchema);
 export default UserModel;

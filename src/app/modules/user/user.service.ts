@@ -1,8 +1,16 @@
-import { User } from './user.interface';
+import { TUser } from './user.interface';
 import UserModel from './user.model';
 
-const createUserIntoDb = async (user: User) => {
+const createUserIntoDb = async (user: TUser) => {
   const result = await UserModel.create(user);
+  return result;
+};
+const updateUserIntoDb = async (userId: number, user: TUser) => {
+  const result = await UserModel.updateOne(
+    { userId },
+    { $set: user },
+    { new: true },
+  );
   return result;
 };
 const getAllUserIntoDb = async () => {
@@ -22,6 +30,7 @@ const getUserByIdIntoDb = async (userId: number) => {
 
 const userServices = {
   createUserIntoDb,
+  updateUserIntoDb,
   getAllUserIntoDb,
   getUserByIdIntoDb,
 };
