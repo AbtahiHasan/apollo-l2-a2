@@ -127,11 +127,47 @@ const getUserById = async (req: Request, res: Response) => {
   }
 };
 
+const deleteUserById = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const userIsExists = await UserModel.isUserExists(Number(userId));
+    if (!userIsExists) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+    const result = await userServices.deleteUserByIdIntoDb(Number(userId));
+
+    return res.status(200).json({
+      success: true,
+      message: 'User deleted successfully!',
+      data: result,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'internal server error',
+      error: error,
+      // error: {
+      //   code: 400,
+      //   description: 'User not found!',
+      // },
+    });
+  }
+};
+
 const userController = {
   createUser,
   updateUser,
   getAllUsers,
   getUserById,
+  deleteUserById,
 };
 
 export default userController;

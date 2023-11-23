@@ -27,12 +27,17 @@ const getUserByIdIntoDb = async (userId: number) => {
   const result = await UserModel.findOne({ userId });
   return result;
 };
+const deleteUserByIdIntoDb = async (userId: number) => {
+  const result = await UserModel.deleteOne({ userId });
+  return result;
+};
 
 const userServices = {
   createUserIntoDb,
   updateUserIntoDb,
   getAllUserIntoDb,
   getUserByIdIntoDb,
+  deleteUserByIdIntoDb,
 };
 
 export default userServices;
