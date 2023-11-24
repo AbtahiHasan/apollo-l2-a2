@@ -1,23 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 import { model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { IUserModel, TOrder, TUser } from './user.interface';
 import config from '../../config';
 
-const orderSchema = new Schema<TOrder>({
-  productName: {
-    type: String,
-    required: true,
+const orderSchema = new Schema<TOrder>(
+  {
+    productName: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+    },
   },
-  price: {
-    type: Number,
-    required: true,
-  },
-  quantity: {
-    type: Number,
-    required: true,
-  },
-});
+  { _id: false },
+);
 const userSchema = new Schema<TUser, IUserModel>({
   userId: {
     type: Number,
@@ -73,7 +77,6 @@ userSchema.pre('save', async function (next) {
 
   next();
 });
-
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;

@@ -6,11 +6,9 @@ const createUserIntoDb = async (user: TUser) => {
   return result;
 };
 const updateUserIntoDb = async (userId: number, user: TUser) => {
-  const result = await UserModel.updateOne(
-    { userId },
-    { $set: user },
-    { new: true },
-  );
+  await UserModel.updateOne({ userId }, { $set: user }, { new: true });
+
+  const result = await UserModel.findOne({ userId });
   return result;
 };
 

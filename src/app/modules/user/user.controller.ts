@@ -44,6 +44,7 @@ const updateUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params?.userId;
     const userData = req.body;
+
     const userIsExists = await UserModel.isUserExists(Number(userId));
     if (!userIsExists) {
       return res.status(404).json({
