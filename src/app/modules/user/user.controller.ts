@@ -44,7 +44,6 @@ const updateUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params?.userId;
     const userData = req.body;
-
     const userIsExists = await UserModel.isUserExists(Number(userId));
     if (!userIsExists) {
       return res.status(404).json({
@@ -56,30 +55,17 @@ const updateUser = async (req: Request, res: Response) => {
         },
       });
     }
-    const zodParsedData = userValidationSchema.safeParse(userData);
 
-    if (zodParsedData.success) {
-      const result = await userServices.updateUserIntoDb(
-        Number(userId),
-        zodParsedData.data,
-      );
+    const result = await userServices.updateUserIntoDb(
+      Number(userId),
+      userData,
+    );
 
-      res.status(200).json({
-        success: true,
-        message: 'User updated successfully!',
-        data: result,
-      });
-    } else {
-      const error = fromZodError(zodParsedData.error);
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'internal server error',
-        error: {
-          code: 400,
-          description: error.details,
-        },
-      });
-    }
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully!',
+      data: result,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
