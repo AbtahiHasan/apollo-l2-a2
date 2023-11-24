@@ -280,7 +280,11 @@ const getUserOrdersTotalPrice = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: 'Total price calculated successfully!',
-      data: { totalPrice: result[0]?.totalPrice || 0 },
+      data: {
+        totalPrice: Number.isInteger(result[0]?.totalPrice)
+          ? result[0]?.totalPrice
+          : parseFloat(result[0]?.totalPrice.toFixed(2)) || 0,
+      },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

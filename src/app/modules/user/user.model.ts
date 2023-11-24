@@ -74,10 +74,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.post('save', (document, next) => {
-  document.password = '';
-  next();
-});
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
 
 userSchema.statics.isUserExists = async function (userId: number) {
   const existingUser = await UserModel.findOne({ userId });
