@@ -1,29 +1,42 @@
 import { Request, Response } from 'express';
+import { fromZodError } from 'zod-validation-error';
 import userServices from './user.service';
 import userValidationSchema, { orderSchema } from './user.validation';
 import UserModel from './user.model';
+
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
-    const zodParsedData = userValidationSchema.parse(userData);
+    const zodParsedData = userValidationSchema.safeParse(userData);
 
-    const result = await userServices.createUserIntoDb(zodParsedData);
+    if (zodParsedData.success) {
+      const result = await userServices.createUserIntoDb(zodParsedData.data);
+      res.status(200).json({
+        success: true,
+        message: 'user created successfully!',
+        data: result,
+      });
+    } else {
+      const error = fromZodError(zodParsedData.error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'internal server error',
+        error: {
+          code: 400,
+          description: error.details,
+        },
+      });
+    }
 
-    res.status(200).json({
-      success: true,
-      message: 'user created successfully!',
-      data: result,
-    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return res.status(500).json({
       success: false,
       message: error.message || 'internal server error',
-      error: error,
-      // error: {
-      //   code: 400,
-      //   description: 'User not found!',
-      // },
+      error: {
+        code: 500,
+        description: error.message,
+      },
     });
   }
 };
@@ -43,29 +56,40 @@ const updateUser = async (req: Request, res: Response) => {
         },
       });
     }
+    const zodParsedData = userValidationSchema.safeParse(userData);
 
-    const zodParsedData = userValidationSchema.parse(userData);
+    if (zodParsedData.success) {
+      const result = await userServices.updateUserIntoDb(
+        Number(userId),
+        zodParsedData.data,
+      );
 
-    const result = await userServices.updateUserIntoDb(
-      Number(userId),
-      zodParsedData,
-    );
+      res.status(200).json({
+        success: true,
+        message: 'User updated successfully!',
+        data: result,
+      });
+    } else {
+      const error = fromZodError(zodParsedData.error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'internal server error',
+        error: {
+          code: 400,
+          description: error.details,
+        },
+      });
+    }
 
-    res.status(200).json({
-      success: true,
-      message: 'User updated successfully!',
-      data: result,
-    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return res.status(500).json({
       success: false,
       message: error.message || 'internal server error',
-      error: error,
-      // error: {
-      //   code: 400,
-      //   description: 'User not found!',
-      // },
+      error: {
+        code: 500,
+        description: error.message,
+      },
     });
   }
 };
@@ -74,7 +98,7 @@ const addProductInOrder = async (req: Request, res: Response) => {
   try {
     const userId = req.params?.userId;
     const productData = req.body;
-    const zodParsedProduct = orderSchema.parse(productData);
+    const zodParsedProduct = orderSchema.safeParse(productData);
     const user = await UserModel.isUserExists(Number(userId));
     if (!user) {
       return res.status(404).json({
@@ -87,30 +111,42 @@ const addProductInOrder = async (req: Request, res: Response) => {
       });
     }
 
-    await UserModel.updateOne(
-      { userId },
-      {
-        $push: {
-          orders: zodParsedProduct,
+    if (zodParsedProduct.success) {
+      await UserModel.updateOne(
+        { userId },
+        {
+          $push: {
+            orders: zodParsedProduct.data,
+          },
         },
-      },
-    );
+      );
 
-    return res.status(200).json({
-      success: true,
-      message: 'Order created successfully!',
-      data: null,
-    });
+      return res.status(200).json({
+        success: true,
+        message: 'Order created successfully!',
+        data: null,
+      });
+    } else {
+      const error = fromZodError(zodParsedProduct.error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'internal server error',
+        error: {
+          code: 400,
+          description: error.details,
+        },
+      });
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return res.status(500).json({
       success: false,
       message: error.message || 'internal server error',
-      error: error,
-      // error: {
-      //   code: 400,
-      //   description: 'User not found!',
-      // },
+      error: {
+        code: 500,
+        description: error.message,
+      },
     });
   }
 };
@@ -129,11 +165,10 @@ const getAllUsers = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: error.message || 'internal server error',
-      error: error,
-      // error: {
-      //   code: 400,
-      //   description: 'User not found!',
-      // },
+      error: {
+        code: 500,
+        description: error.message,
+      },
     });
   }
 };
@@ -164,11 +199,10 @@ const getUserById = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: error.message || 'internal server error',
-      error: error,
-      // error: {
-      //   code: 400,
-      //   description: 'User not found!',
-      // },
+      error: {
+        code: 500,
+        description: error.message,
+      },
     });
   }
 };
@@ -199,11 +233,10 @@ const deleteUserById = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: error.message || 'internal server error',
-      error: error,
-      // error: {
-      //   code: 400,
-      //   description: 'User not found!',
-      // },
+      error: {
+        code: 500,
+        description: error.message,
+      },
     });
   }
 };
@@ -234,11 +267,10 @@ const getUserOrders = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: error.message || 'internal server error',
-      error: error,
-      // error: {
-      //   code: 400,
-      //   description: 'User not found!',
-      // },
+      error: {
+        code: 500,
+        description: error.message,
+      },
     });
   }
 };
@@ -269,11 +301,10 @@ const getUserOrdersTotalPrice = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: error.message || 'internal server error',
-      error: error,
-      // error: {
-      //   code: 400,
-      //   description: 'User not found!',
-      // },
+      error: {
+        code: 500,
+        description: error.message,
+      },
     });
   }
 };
