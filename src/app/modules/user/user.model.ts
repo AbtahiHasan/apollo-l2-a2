@@ -21,27 +21,22 @@ const orderSchema = new Schema<TOrder>({
 const userSchema = new Schema<TUser, IUserModel>({
   userId: {
     type: Number,
-    required: true,
     unique: true,
   },
   username: {
     type: String,
-    required: true,
     unique: true,
   },
   password: {
     type: String,
-    required: true,
     select: false,
   },
   fullName: {
     firstName: {
       type: String,
-      required: true,
     },
     lastName: {
       type: String,
-      required: true,
     },
   },
   age: {
@@ -54,21 +49,17 @@ const userSchema = new Schema<TUser, IUserModel>({
   },
   isActive: {
     type: Boolean,
-    required: true,
   },
   hobbies: [String],
   address: {
     street: {
       type: String,
-      required: true,
     },
     city: {
       type: String,
-      required: true,
     },
     country: {
       type: String,
-      required: true,
     },
   },
   orders: [orderSchema],
