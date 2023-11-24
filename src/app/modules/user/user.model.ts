@@ -54,7 +54,7 @@ const userSchema = new Schema<TUser, IUserModel>({
   },
   isActive: {
     type: Boolean,
-    require: true,
+    required: true,
   },
   hobbies: [String],
   address: {
