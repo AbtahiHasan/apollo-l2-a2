@@ -2,7 +2,7 @@
 
 - ### step 1 add .env file
 
-```json
+```bash
 PORT=5000
 DATABASE_URL=database uer here
 BCRYPT_SALT_ROUNDS=12
@@ -10,12 +10,12 @@ BCRYPT_SALT_ROUNDS=12
 
 - ### step 2 install
 
-```json
+```bash
     npm i
 ```
 
 - ### step 3 run with ts-node-dev
 
-```json
+```bash
     npm run dev
 ```
