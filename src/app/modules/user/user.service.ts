@@ -6,7 +6,6 @@ const createUserIntoDb = async (user: TUser) => {
   return result;
 };
 const updateUserIntoDb = async (userId: number, user: TUser) => {
-  console.log(userId, user);
   const result = await UserModel.updateOne(
     { userId },
     { $set: user },
